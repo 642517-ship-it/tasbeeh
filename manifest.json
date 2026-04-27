@@ -1,26 +1,1829 @@
-{
-  "name": "مسبحتي",
-  "short_name": "مسبحتي",
-  "description": "تطبيق التسبيح والصلاة على النبي ﷺ",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0a1f0a",
-  "theme_color": "#0f2d0f",
-  "orientation": "portrait",
-  "lang": "ar",
-  "dir": "rtl",
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ],
-  "categories": ["lifestyle", "utilities"],
-  "shortcuts": [
-    {
-      "name": "ابدأ التسبيح",
-      "short_name": "تسبيح",
-      "description": "افتح جلسة تسبيح جديدة",
-      "url": "./index.html",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
-    }
-  ]
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>مسبحتي</title>
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="مسبحتي">
+<meta name="theme-color" content="#0f2d0f">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;900&display=swap');
+
+  :root {
+    --green-900: #0a1f0a;
+    --green-800: #0f2d0f;
+    --green-700: #1a4a1a;
+    --green-600: #1e5c1e;
+    --green-500: #2d7a2d;
+    --green-400: #3d9e3d;
+    --green-300: #5ab85a;
+    --green-200: #8fd98f;
+    --gold-900: #5c3d00;
+    --gold-800: #7a5200;
+    --gold-700: #a06a00;
+    --gold-600: #c68200;
+    --gold-500: #d4a017;
+    --gold-400: #e6b830;
+    --gold-300: #f0cc55;
+    --gold-200: #f8e08a;
+    --gold-100: #fdf3cc;
+    --bg: #0a1f0a;
+    --surface: #0f2d0f;
+    --surface2: #152615;
+    --card: #1a3a1a;
+    --text: #f8e08a;
+    --text-muted: #8fd98f;
+    --border: rgba(212,160,23,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    direction: rtl;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== SPLASH ===== */
+  #splash {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #1a4a1a 0%, #0a1f0a 70%);
+    position: relative;
+    overflow: hidden;
+  }
+  #splash::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,160,23,0.15);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation: pulse-ring 2s ease-out infinite;
+  }
+  #splash::after {
+    content: '';
+    position: absolute;
+    width: 450px; height: 450px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,160,23,0.08);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    animation: pulse-ring 2s ease-out 0.5s infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: translate(-50%,-50%) scale(0.8); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1.2); opacity: 0; }
+  }
+  .splash-icon {
+    width: 120px; height: 120px;
+    background: linear-gradient(135deg, var(--gold-500), var(--gold-300));
+    border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 60px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 40px rgba(212,160,23,0.4);
+    position: relative;
+    z-index: 1;
+    animation: icon-glow 3s ease-in-out infinite;
+  }
+  @keyframes icon-glow {
+    0%,100% { box-shadow: 0 0 40px rgba(212,160,23,0.4); }
+    50% { box-shadow: 0 0 70px rgba(212,160,23,0.7); }
+  }
+  .splash-title {
+    font-family: 'Amiri', serif;
+    font-size: 42px; font-weight: 700;
+    color: var(--gold-300);
+    text-align: center;
+    position: relative; z-index: 1;
+    text-shadow: 0 2px 20px rgba(212,160,23,0.5);
+  }
+  .splash-sub {
+    font-size: 14px; color: var(--green-200);
+    margin-top: 8px; letter-spacing: 2px;
+    position: relative; z-index: 1;
+  }
+  .splash-bar {
+    width: 200px; height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-top: 40px;
+    overflow: hidden;
+    position: relative; z-index: 1;
+  }
+  .splash-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-500), var(--gold-300));
+    border-radius: 2px;
+    animation: loading 1.8s ease-in-out forwards;
+  }
+  @keyframes loading {
+    0% { width: 0; }
+    100% { width: 100%; }
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    font-family: 'Amiri', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--gold-300);
+  }
+  .icon-btn {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--gold-400);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .icon-btn:active { transform: scale(0.92); background: var(--green-600); }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 8px 0 20px;
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    cursor: pointer;
+    padding: 8px 0;
+    color: var(--green-300);
+    font-size: 11px;
+    font-family: 'Cairo', sans-serif;
+    transition: color 0.2s;
+    border: none; background: none;
+  }
+  .nav-btn .nav-icon { font-size: 22px; }
+  .nav-btn.active { color: var(--gold-400); }
+  .nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px rgba(212,160,23,0.6)); }
+
+  /* ===== MAIN SCREEN ===== */
+  #main { background: var(--bg); }
+  .main-content {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 20px 20px 10px;
+    overflow-y: auto;
+  }
+
+  /* Session type badge */
+  .session-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 13px;
+    color: var(--gold-300);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .session-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold-400);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Dhikr display */
+  .dhikr-card {
+    width: 100%;
+    background: linear-gradient(135deg, var(--surface) 0%, var(--card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dhikr-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; left: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,23,0.08) 0%, transparent 70%);
+  }
+  .dhikr-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; right: -30px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,122,45,0.15) 0%, transparent 70%);
+  }
+  .dhikr-arabic {
+    font-family: 'Amiri', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold-200);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+    text-shadow: 0 2px 15px rgba(212,160,23,0.3);
+  }
+  .dhikr-type-label {
+    font-size: 12px;
+    color: var(--green-300);
+    letter-spacing: 1px;
+    position: relative; z-index: 1;
+  }
+  .dhikr-type-label:empty { display: none; }
+
+  /* Progress arc */
+  .progress-container {
+    position: relative;
+    width: 200px; height: 200px;
+    margin: 10px auto;
+  }
+  .progress-svg { transform: rotate(-90deg); }
+  .progress-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+  .progress-fill {
+    fill: none;
+    stroke: url(#gold-gradient);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+  }
+  .progress-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .counter-num {
+    font-family: 'Cairo', sans-serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--gold-300);
+    line-height: 1;
+    text-shadow: 0 2px 20px rgba(212,160,23,0.4);
+  }
+  .counter-total {
+    font-size: 14px;
+    color: var(--green-300);
+    margin-top: 4px;
+  }
+
+  /* TAP BUTTON */
+  .tap-btn {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: none;
+    background: radial-gradient(circle at 35% 35%, var(--green-400), var(--green-700));
+    box-shadow:
+      0 8px 30px rgba(0,0,0,0.5),
+      0 0 0 6px rgba(45,122,45,0.2),
+      inset 0 2px 6px rgba(255,255,255,0.1),
+      inset 0 -4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.15s ease;
+    position: relative;
+    margin: 20px auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tap-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(212,160,23,0.4);
+    animation: ring-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes ring-pulse {
+    0%,100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.08); opacity: 0.8; }
+  }
+  .tap-btn:active {
+    transform: scale(0.94);
+    box-shadow:
+      0 4px 15px rgba(0,0,0,0.5),
+      0 0 0 3px rgba(45,122,45,0.2),
+      inset 0 4px 10px rgba(0,0,0,0.4);
+  }
+  .tap-btn .tap-icon { font-size: 36px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+  .tap-btn .tap-label {
+    font-family: 'Amiri', serif;
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+  }
+  .tap-btn.tapped { animation: tap-bounce 0.3s ease; }
+  @keyframes tap-bounce {
+    0% { transform: scale(0.94); }
+    60% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  /* Session info row */
+  .session-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .session-info-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+  }
+  .session-info-card .si-label { font-size: 11px; color: var(--green-300); margin-bottom: 4px; }
+  .session-info-card .si-value { font-size: 20px; font-weight: 700; color: var(--gold-300); }
+
+  /* Celebration overlay */
+  .celebration {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .celebration.show { opacity: 1; pointer-events: all; }
+  .celebration-card {
+    background: linear-gradient(135deg, var(--green-700), var(--green-900));
+    border: 1px solid var(--gold-500);
+    border-radius: 28px;
+    padding: 40px 30px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes pop-in {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .celeb-icon { font-size: 60px; margin-bottom: 16px; }
+  .celeb-title {
+    font-family: 'Amiri', serif;
+    font-size: 28px; color: var(--gold-300);
+    margin-bottom: 8px; font-weight: 700;
+  }
+  .celeb-msg { font-size: 14px; color: var(--green-200); margin-bottom: 24px; line-height: 1.6; }
+  .celeb-next {
+    background: linear-gradient(135deg, var(--gold-500), var(--gold-300));
+    color: var(--green-900);
+    border: none;
+    border-radius: 14px;
+    padding: 14px 32px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s;
+  }
+  .celeb-next:active { transform: scale(0.96); }
+  .celeb-close {
+    background: transparent;
+    border: 1px solid rgba(212,160,23,0.3);
+    color: var(--green-300);
+    border-radius: 14px;
+    padding: 12px 32px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    transition: background 0.2s;
+  }
+  .celeb-close:active { background: rgba(212,160,23,0.08); }
+
+  /* ===== STATS SCREEN ===== */
+  #stats { background: var(--bg); }
+  .stats-content {
+    flex: 1; overflow-y: auto;
+    padding: 16px 20px 20px;
+  }
+  .stats-hero {
+    background: linear-gradient(135deg, var(--surface), var(--card));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .stats-hero-num {
+    font-family: 'Cairo', sans-serif;
+    font-size: 56px; font-weight: 900;
+    color: var(--gold-300);
+    line-height: 1;
+    text-shadow: 0 2px 20px rgba(212,160,23,0.4);
+  }
+  .stats-hero-label { font-size: 13px; color: var(--green-300); margin-top: 6px; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .sc-num {
+    font-size: 28px; font-weight: 700;
+    color: var(--gold-300);
+  }
+  .stat-card .sc-label {
+    font-size: 11px; color: var(--green-300);
+    margin-top: 4px;
+  }
+
+  .section-title {
+    font-size: 14px; color: var(--gold-400);
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding-right: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Daily history */
+  .day-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .day-row .dr-date { font-size: 13px; color: var(--green-300); }
+  .day-row .dr-count { font-size: 18px; font-weight: 700; color: var(--gold-300); }
+  .day-bar-wrap { flex: 1; margin: 0 12px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .day-bar { height: 100%; background: linear-gradient(90deg, var(--green-500), var(--gold-500)); border-radius: 3px; transition: width 0.5s ease; }
+
+  /* Reset btn */
+  .reset-btn {
+    background: transparent;
+    border: 1px solid rgba(255,80,80,0.4);
+    color: rgba(255,120,120,0.8);
+    border-radius: 12px;
+    padding: 12px;
+    width: 100%;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+  .reset-btn:active { background: rgba(255,80,80,0.1); }
+
+  /* ===== SETTINGS SCREEN ===== */
+  #settings-screen { background: var(--bg); }
+  .settings-content { flex: 1; overflow-y: auto; padding: 16px 20px 20px; }
+
+  .settings-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .settings-group-title {
+    font-size: 12px;
+    color: var(--gold-400);
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 14px 16px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(212,160,23,0.1);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-label { font-size: 14px; color: var(--text); }
+  .setting-sub { font-size: 11px; color: var(--green-300); margin-top: 2px; }
+
+  /* Toggle */
+  .toggle {
+    width: 50px; height: 28px;
+    background: var(--surface2);
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .toggle.on { background: var(--green-500); border-color: var(--green-400); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 22px; height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 2px; right: 2px;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .toggle.on::after { transform: translateX(-22px); }
+
+  /* Number input */
+  .num-input-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .num-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--gold-400);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .num-btn:active { transform: scale(0.9); background: var(--green-600); }
+  .num-val {
+    font-size: 18px; font-weight: 700;
+    color: var(--gold-300);
+    min-width: 32px; text-align: center;
+  }
+
+  /* Time pills */
+  .times-list { display: flex; flex-direction: column; gap: 8px; }
+  .time-pill {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  .time-pill input[type="time"] {
+    background: transparent;
+    border: none;
+    color: var(--gold-300);
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px; font-weight: 600;
+    direction: ltr;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .time-pill input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) sepia(1) saturate(2) hue-rotate(20deg);
+    opacity: 0.7;
+  }
+  .time-remove {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,80,80,0.2);
+    color: rgba(255,120,120,0.8);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+
+  .add-time-btn {
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--gold-400);
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.2s;
+  }
+  .add-time-btn:active { background: var(--surface2); }
+
+  /* Save btn */
+  .save-btn {
+    background: linear-gradient(135deg, var(--gold-500), var(--gold-400));
+    color: var(--green-900);
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    width: 100%;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: transform 0.2s;
+  }
+  .save-btn:active { transform: scale(0.97); }
+
+  /* Confetti particles */
+  .confetti-particle {
+    position: fixed;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 200;
+    animation: confetti-fall 2s ease-in forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+
+  /* ===== HOME SCREEN ===== */
+  #home { background: var(--bg); }
+  .home-content {
+    flex: 1; overflow-y: auto;
+    padding: 20px 18px 16px;
+    display: flex; flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Hijri date card */
+  .hijri-card {
+    background: linear-gradient(135deg, var(--surface), var(--card));
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 22px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hijri-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,23,0.08) 0%, transparent 70%);
+  }
+  .hijri-card::after {
+    content: '☪';
+    position: absolute;
+    top: 12px; left: 16px;
+    font-size: 28px;
+    color: rgba(212,160,23,0.25);
+    z-index: 0;
+  }
+  .hijri-day {
+    font-family: 'Amiri', serif;
+    font-size: 22px;
+    color: var(--gold-300);
+    font-weight: 700;
+    margin-bottom: 6px;
+    position: relative; z-index: 1;
+  }
+  .hijri-date {
+    font-family: 'Amiri', serif;
+    font-size: 28px;
+    color: var(--gold-200);
+    font-weight: 700;
+    margin-bottom: 6px;
+    position: relative; z-index: 1;
+    text-shadow: 0 2px 12px rgba(212,160,23,0.3);
+  }
+  .gregorian-date {
+    font-size: 12px;
+    color: var(--green-300);
+    letter-spacing: 0.5px;
+    position: relative; z-index: 1;
+  }
+
+  /* Du'a card */
+  .dua-card {
+    background: linear-gradient(135deg, var(--green-700) 0%, var(--green-900) 100%);
+    border: 1px solid var(--gold-500);
+    border-radius: 22px;
+    padding: 22px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .dua-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top, rgba(212,160,23,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .dua-header {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    position: relative; z-index: 1;
+  }
+  .dua-icon { font-size: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  .dua-title {
+    font-family: 'Amiri', serif;
+    font-size: 18px;
+    color: var(--gold-300);
+    font-weight: 700;
+  }
+  .dua-text {
+    font-family: 'Amiri', serif;
+    font-size: 19px;
+    color: var(--gold-100);
+    line-height: 1.9;
+    position: relative; z-index: 1;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+    padding: 8px 4px;
+  }
+  .dua-ornament {
+    color: var(--gold-600);
+    font-size: 14px;
+    margin-top: 14px;
+    letter-spacing: 8px;
+    position: relative; z-index: 1;
+  }
+
+  /* Home quick stats */
+  .home-quick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .home-quick-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 12px;
+    text-align: center;
+  }
+  .home-quick-gold {
+    background: linear-gradient(135deg, var(--surface), rgba(212,160,23,0.08));
+    border-color: rgba(212,160,23,0.5);
+  }
+  .hqc-num {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--gold-300);
+    line-height: 1;
+    text-shadow: 0 2px 12px rgba(212,160,23,0.3);
+  }
+  .hqc-label {
+    font-size: 12px;
+    color: var(--green-300);
+    margin-top: 6px;
+  }
+
+  /* Toggle switch (tasbeeh ↔ salah) on main screen */
+  .session-toggle-btn {
+    background: linear-gradient(135deg, var(--card), var(--surface));
+    border: 1px solid var(--gold-500);
+    border-radius: 16px;
+    padding: 10px 18px;
+    font-family: 'Amiri', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold-300);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .session-toggle-btn:active {
+    transform: scale(0.95);
+    background: var(--green-600);
+  }
+  .session-toggle-btn .swap-icon {
+    font-size: 14px;
+    color: var(--gold-500);
+    opacity: 0.7;
+    transition: transform 0.4s;
+  }
+  .session-toggle-btn.swapping .swap-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Arabesque ornament */
+  .ornament { color: var(--gold-600); font-size: 18px; line-height: 1; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div class="screen active" id="splash">
+  <div class="splash-icon">📿</div>
+  <div class="splash-title">مسبحتي</div>
+  <div class="splash-sub">ذكر الله</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
+<!-- HOME SCREEN (new landing) -->
+<div class="screen" id="home">
+  <div class="topbar">
+    <div class="topbar-title">📿 مسبحتي</div>
+    <div></div>
+  </div>
+
+  <div class="home-content">
+    <!-- Hijri date card -->
+    <div class="hijri-card">
+      <div class="hijri-day" id="hijri-day">—</div>
+      <div class="hijri-date" id="hijri-date">—</div>
+      <div class="gregorian-date" id="greg-date">—</div>
+    </div>
+
+    <!-- Daily du'a card -->
+    <div class="dua-card">
+      <div class="dua-header">
+        <span class="dua-icon">🤲</span>
+        <span class="dua-title" id="dua-title">دعاء اليوم</span>
+      </div>
+      <div class="dua-text" id="dua-text">—</div>
+      <div class="dua-ornament">❧ ❧ ❧</div>
+    </div>
+
+    <!-- Quick stats teaser -->
+    <div class="home-quick">
+      <div class="home-quick-card">
+        <div class="hqc-num" id="home-today">0</div>
+        <div class="hqc-label">تسابيح اليوم</div>
+      </div>
+      <div class="home-quick-card home-quick-gold">
+        <div class="hqc-num" id="home-permanent">0</div>
+        <div class="hqc-label">التراكمي ♾️</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="showScreen('home')" id="nav-home">
+      <span class="nav-icon">🏠</span>الرئيسية
+    </button>
+    <button class="nav-btn" onclick="showScreen('main')" id="nav-tasbeeh">
+      <span class="nav-icon">📿</span>التسبيح
+    </button>
+    <button class="nav-btn" onclick="showScreen('stats')" id="nav-stats0">
+      <span class="nav-icon">📊</span>الإحصائيات
+    </button>
+    <button class="nav-btn" onclick="showScreen('settings-screen')" id="nav-settings0">
+      <span class="nav-icon">⚙️</span>الإعدادات
+    </button>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div class="screen" id="main">
+  <div class="topbar">
+    <div class="topbar-title">📿 مسبحتي</div>
+    <button class="icon-btn" onclick="resetSession()" title="إعادة تعيين">↺</button>
+  </div>
+
+  <div class="main-content">
+    <!-- Session type toggle button -->
+    <button class="session-toggle-btn" id="session-toggle" onclick="toggleSessionType()">
+      <span class="swap-icon">⇄</span>
+      <span id="session-label">جلسة التسابيح</span>
+    </button>
+
+    <!-- Dhikr card -->
+    <div class="dhikr-card">
+      <div class="dhikr-arabic" id="current-dhikr">سبحان الله</div>
+      <div class="dhikr-type-label" id="dhikr-type-label">التسابيح • ١ من ٤</div>
+    </div>
+
+    <!-- Progress arc + counter -->
+    <div class="progress-container">
+      <svg class="progress-svg" width="200" height="200" viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#d4a017"/>
+            <stop offset="100%" style="stop-color:#f0cc55"/>
+          </linearGradient>
+        </defs>
+        <circle class="progress-bg" cx="100" cy="100" r="85"/>
+        <circle class="progress-fill" id="progress-circle" cx="100" cy="100" r="85"
+          stroke-dasharray="534" stroke-dashoffset="534"/>
+      </svg>
+      <div class="progress-center">
+        <div class="counter-num" id="counter-display">0</div>
+        <div class="counter-total">من 100</div>
+      </div>
+    </div>
+
+    <!-- TAP BUTTON -->
+    <button class="tap-btn" id="tap-btn" onclick="handleTap()">
+      <div class="tap-icon">☝️</div>
+      <div class="tap-label">اضغط</div>
+    </button>
+
+    <!-- Session info -->
+    <div class="session-row">
+      <div class="session-info-card">
+        <div class="si-label">إجمالي اليوم</div>
+        <div class="si-value" id="today-total">0</div>
+      </div>
+      <div class="session-info-card">
+        <div class="si-label">التراكمي الكلي ♾️</div>
+        <div class="si-value" id="grand-total">0</div>
+      </div>
+      <div class="session-info-card">
+        <div class="si-label">الجلسة</div>
+        <div class="si-value" id="session-num">1</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('home')" id="nav-home1">
+      <span class="nav-icon">🏠</span>الرئيسية
+    </button>
+    <button class="nav-btn active" onclick="showScreen('main')" id="nav-main">
+      <span class="nav-icon">📿</span>التسبيح
+    </button>
+    <button class="nav-btn" onclick="showScreen('stats')" id="nav-stats">
+      <span class="nav-icon">📊</span>الإحصائيات
+    </button>
+    <button class="nav-btn" onclick="showScreen('settings-screen')" id="nav-settings">
+      <span class="nav-icon">⚙️</span>الإعدادات
+    </button>
+  </div>
+</div>
+
+<!-- STATS SCREEN -->
+<div class="screen" id="stats">
+  <div class="topbar">
+    <div class="topbar-title">📊 الإحصائيات</div>
+    <div></div>
+  </div>
+
+  <div class="stats-content">
+    <!-- Hero total — permanent, never reset -->
+    <div class="stats-hero">
+      <div style="font-size:11px;color:var(--gold-500);letter-spacing:1px;margin-bottom:6px">♾️ العداد التراكمي الأبدي — لا يُمسح أبداً</div>
+      <div class="stats-hero-num" id="sh-total">0</div>
+      <div class="stats-hero-label">إجمالي جميع التسابيح منذ بداية الاستخدام</div>
+    </div>
+
+    <!-- Grid cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="sc-num" id="sc-today">0</div>
+        <div class="sc-label">اليوم</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num" id="sc-yesterday">0</div>
+        <div class="sc-label">أمس</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num" id="sc-week">0</div>
+        <div class="sc-label">هذا الأسبوع</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num" id="sc-sessions">0</div>
+        <div class="sc-label">جلسات اليوم</div>
+      </div>
+    </div>
+
+    <!-- Daily history -->
+    <div class="section-title">🗓️ السجل اليومي</div>
+    <div id="daily-history"></div>
+
+    <button class="reset-btn" onclick="confirmReset()">🗑️ مسح جميع الإحصائيات</button>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('home')" id="nav-home2">
+      <span class="nav-icon">🏠</span>الرئيسية
+    </button>
+    <button class="nav-btn" onclick="showScreen('main')" id="nav-main2">
+      <span class="nav-icon">📿</span>التسبيح
+    </button>
+    <button class="nav-btn active" onclick="showScreen('stats')" id="nav-stats2">
+      <span class="nav-icon">📊</span>الإحصائيات
+    </button>
+    <button class="nav-btn" onclick="showScreen('settings-screen')" id="nav-settings2">
+      <span class="nav-icon">⚙️</span>الإعدادات
+    </button>
+  </div>
+</div>
+
+<!-- SETTINGS SCREEN -->
+<div class="screen" id="settings-screen">
+  <div class="topbar">
+    <div class="topbar-title">⚙️ الإعدادات</div>
+    <div></div>
+  </div>
+
+  <div class="settings-content">
+    <!-- Daily sessions -->
+    <div class="settings-group">
+      <div class="settings-group-title">جلسات التسبيح اليومية</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">عدد المرات في اليوم</div>
+          <div class="setting-sub">كم مرة تسبح يومياً</div>
+        </div>
+        <div class="num-input-row">
+          <button class="num-btn" onclick="changeCount(-1)">−</button>
+          <div class="num-val" id="count-val">3</div>
+          <button class="num-btn" onclick="changeCount(1)">+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">عدد التسابيح لكل جلسة</div>
+          <div class="setting-sub">الرقم المستهدف</div>
+        </div>
+        <div class="num-input-row">
+          <button class="num-btn" onclick="changeTarget(-10)">−</button>
+          <div class="num-val" id="target-val">100</div>
+          <button class="num-btn" onclick="changeTarget(10)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="settings-group">
+      <div class="settings-group-title">الإشعارات والتذكيرات</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">تفعيل الإشعارات</div>
+          <div class="setting-sub">تذكير بالتسبيح في أوقات محددة</div>
+        </div>
+        <div class="toggle on" id="notif-toggle" onclick="toggleNotif()"></div>
+      </div>
+      <div class="setting-row" id="times-section">
+        <div style="width:100%">
+          <div class="setting-label" style="margin-bottom:10px">أوقات التذكير</div>
+          <div class="times-list" id="times-list"></div>
+          <button class="add-time-btn" onclick="addTime()">+ إضافة وقت</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vibration -->
+    <div class="settings-group">
+      <div class="settings-group-title">الصوت والاهتزاز</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">اهتزاز عند الضغط</div>
+          <div class="setting-sub">اهتزاز خفيف مع كل ضغطة</div>
+        </div>
+        <div class="toggle on" id="vib-toggle" onclick="toggleVib()"></div>
+      </div>
+    </div>
+
+    <button class="save-btn" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('home')" id="nav-home3">
+      <span class="nav-icon">🏠</span>الرئيسية
+    </button>
+    <button class="nav-btn" onclick="showScreen('main')" id="nav-main3">
+      <span class="nav-icon">📿</span>التسبيح
+    </button>
+    <button class="nav-btn" onclick="showScreen('stats')" id="nav-stats3">
+      <span class="nav-icon">📊</span>الإحصائيات
+    </button>
+    <button class="nav-btn active" onclick="showScreen('settings-screen')" id="nav-settings3">
+      <span class="nav-icon">⚙️</span>الإعدادات
+    </button>
+  </div>
+</div>
+
+<!-- CELEBRATION OVERLAY -->
+<div class="celebration" id="celebration">
+  <div class="celebration-card">
+    <div class="celeb-icon" id="celeb-icon">🎉</div>
+    <div class="celeb-title" id="celeb-title">أحسنت!</div>
+    <div class="celeb-msg" id="celeb-msg">أتممت الجلسة بنجاح</div>
+    <!-- shown when finishing tasbeeh → offer salah session -->
+    <button class="celeb-next" id="celeb-btn-next" onclick="startNextType()" style="display:none">
+      📿 ابدأ جلسة الصلاة على النبي ﷺ
+    </button>
+    <!-- shown when finishing salah → offer new tasbeeh session -->
+    <button class="celeb-next" id="celeb-btn-new" onclick="startNewSession()" style="display:none">
+      🌙 جلسة جديدة
+    </button>
+    <!-- always: close and stay on done screen -->
+    <button class="celeb-close" id="celeb-btn-close" onclick="closeCelebration()">
+      إغلاق
+    </button>
+  </div>
+</div>
+
+<script>
+// ======= STATE =======
+const TASBEEH = [
+  { text: 'سبحان الله',    label: '' },
+  { text: 'الحمد لله',     label: '' },
+  { text: 'لا إله إلا الله', label: '' },
+  { text: 'الله أكبر',     label: '' }
+];
+
+const SALAH = {
+  text: 'اللهم صلِّ وسلِّم وبارك على سيدنا محمد\nوعلى آله وصحبه جميعاً',
+  label: ''
+};
+
+// Storage key prefix
+const SK = 'tasbeeh_';
+function ls(k) { try { return localStorage.getItem(SK+k); } catch(e){return null;} }
+function ss(k,v) { try { localStorage.setItem(SK+k, v); } catch(e){} }
+
+// Load persisted state
+let state = {
+  // current session type (which screen the user is in)
+  sessionType: ls('sessionType') || 'tasbeeh', // 'tasbeeh' | 'salah'
+  // Tasbeeh-specific progress (separately persisted)
+  tasbeehIndex: parseInt(ls('tasbeehIndex')||'0'),
+  tasbeehCounter: parseInt(ls('tasbeehCounter') || ls('counter') || '0'),
+  // Salah-specific progress
+  salahCounter: parseInt(ls('salahCounter')||'0'),
+  sessionNum: parseInt(ls('sessionNum')||'1'),
+  // settings
+  dailyCount: parseInt(ls('dailyCount')||'3'),
+  target: parseInt(ls('target')||'100'),
+  notifOn: ls('notifOn') !== 'false',
+  vibOn: ls('vibOn') !== 'false',
+  notifTimes: JSON.parse(ls('notifTimes')||'["07:00","13:00","21:00"]'),
+  // stats — grandTotal is NEVER reset
+  grandTotal: parseInt(ls('grandTotal')||'0'),
+  // permanentTotal: cumulative forever, cannot be cleared
+  permanentTotal: parseInt(ls('permanentTotal')||'0'),
+  todayTotal: parseInt(ls('todayTotal')||'0'),
+  lastDate: ls('lastDate') || '',
+  daily: JSON.parse(ls('daily')||'{}'),
+};
+
+// Make sure permanentTotal is never less than grandTotal (migration safety)
+if (state.permanentTotal < state.grandTotal) {
+  state.permanentTotal = state.grandTotal;
+  ss('permanentTotal', state.permanentTotal);
 }
+
+// Check if day changed
+function checkDay() {
+  const today = new Date().toLocaleDateString('ar-SA');
+  if (state.lastDate !== today) {
+    // Save yesterday if had activity
+    if (state.todayTotal > 0 && state.lastDate) {
+      state.daily[state.lastDate] = state.todayTotal;
+      ss('daily', JSON.stringify(state.daily));
+    }
+    state.lastDate = today;
+    state.todayTotal = 0;
+    state.sessionNum = 1;
+    ss('lastDate', today);
+    ss('todayTotal','0');
+    ss('sessionNum','1');
+  }
+}
+checkDay();
+
+// ════════════════════════════════════════════════════════════════════
+// Counter helpers — read/write the right counter for the active session
+// ════════════════════════════════════════════════════════════════════
+function getCounter() {
+  return state.sessionType === 'tasbeeh' ? state.tasbeehCounter : state.salahCounter;
+}
+function setCounter(n) {
+  if (state.sessionType === 'tasbeeh') {
+    state.tasbeehCounter = n;
+    ss('tasbeehCounter', n);
+  } else {
+    state.salahCounter = n;
+    ss('salahCounter', n);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// Hijri date — uses Intl.DateTimeFormat with Islamic-Umm al-Qura calendar
+// ════════════════════════════════════════════════════════════════════
+const HIJRI_MONTHS = [
+  'محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة',
+  'رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'
+];
+const ARABIC_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const ARABIC_MONTHS_GREG = [
+  'يناير','فبراير','مارس','أبريل','مايو','يونيو',
+  'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'
+];
+
+function getHijriDate() {
+  try {
+    // Use Umm al-Qura Islamic calendar
+    const fmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'numeric', year: 'numeric'
+    });
+    const parts = fmt.formatToParts(new Date());
+    let d=1, m=1, y=1446;
+    parts.forEach(p => {
+      if (p.type === 'day') d = parseInt(p.value);
+      if (p.type === 'month') m = parseInt(p.value);
+      if (p.type === 'year') y = parseInt(p.value);
+    });
+    return { day: d, month: m, year: y, monthName: HIJRI_MONTHS[m-1] || HIJRI_MONTHS[0] };
+  } catch(e) {
+    return { day: 1, month: 1, year: 1446, monthName: HIJRI_MONTHS[0] };
+  }
+}
+
+// Convert Western digits to Arabic-Indic digits
+function toArDigits(n) {
+  const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  return String(n).replace(/\d/g, d => ar[+d]);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// Daily Du'a — rotates by day-of-year so each day has a different du'a
+// ════════════════════════════════════════════════════════════════════
+const DAILY_DUAS = [
+  { title: 'دعاء الرزق',
+    text: 'اللهم إني أسألك من فضلك ورحمتك، فإنه لا يملكها إلا أنت. اللهم ارزقني رزقاً حلالاً طيباً مباركاً فيه.' },
+  { title: 'دعاء الصحة والعافية',
+    text: 'اللهم عافني في بدني، اللهم عافني في سمعي، اللهم عافني في بصري، لا إله إلا أنت.' },
+  { title: 'دعاء فك الكرب',
+    text: 'لا إله إلا الله العظيم الحليم، لا إله إلا الله رب العرش العظيم، لا إله إلا الله رب السماوات ورب الأرض ورب العرش الكريم.' },
+  { title: 'دعاء التوبة',
+    text: 'اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت.' },
+  { title: 'دعاء الوالدين',
+    text: 'رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا. اللهم اغفر لوالديَّ وارحمهما واجزهما عني خير الجزاء.' },
+  { title: 'دعاء الهداية',
+    text: 'اللهم إني أسألك الهدى والتقى، والعفاف والغنى. اللهم اهدني فيمن هديت، وعافني فيمن عافيت.' },
+  { title: 'دعاء الستر والحفظ',
+    text: 'اللهم استر عوراتي وآمن روعاتي، اللهم احفظني من بين يديَّ ومن خلفي وعن يميني وعن شمالي ومن فوقي.' },
+  { title: 'دعاء حفظ الأبناء',
+    text: 'اللهم احفظ أبنائي بحفظك، واكلأهم برعايتك، واجعلهم قرة عين لي في الدنيا والآخرة، واهدهم سُبُل السلام.' },
+  { title: 'دعاء فك السحر والحسد',
+    text: 'بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم. أعوذ بكلمات الله التامات من شر ما خلق.' },
+  { title: 'دعاء الفرج',
+    text: 'اللهم لا سهل إلا ما جعلته سهلاً، وأنت تجعل الحَزَن إذا شئت سهلاً. اللهم فرّج همي ونفّس كربي واقضِ حاجتي.' },
+  { title: 'دعاء البركة',
+    text: 'اللهم بارك لنا فيما رزقتنا، وبارك لنا في أعمارنا وأهلينا وأموالنا وأولادنا، وقنا عذاب النار.' },
+  { title: 'دعاء صلاح القلب',
+    text: 'يا مقلب القلوب ثبّت قلبي على دينك. اللهم إني أسألك قلباً سليماً ولساناً صادقاً، وأعوذ بك من شر ما تعلم.' },
+  { title: 'دعاء حسن الخاتمة',
+    text: 'اللهم أحسن عاقبتنا في الأمور كلها، وأجرنا من خزي الدنيا وعذاب الآخرة. اللهم اجعل خير أعمالنا خواتمها.' },
+  { title: 'دعاء الشفاء',
+    text: 'اللهم رب الناس، أذهب البأس، اشفِ أنت الشافي، لا شفاء إلا شفاؤك، شفاءً لا يغادر سقماً.' },
+  { title: 'دعاء قضاء الدَّيْن',
+    text: 'اللهم اكفني بحلالك عن حرامك، وأغنني بفضلك عمن سواك. اللهم اقضِ عني دَيْني وأغنني من فقري.' },
+  { title: 'دعاء تيسير الأمور',
+    text: 'رب اشرح لي صدري، ويسر لي أمري، واحلل عقدة من لساني يفقهوا قولي.' },
+  { title: 'دعاء الإيمان',
+    text: 'اللهم إني أسألك إيماناً لا يرتد، ونعيماً لا ينفد، ومرافقة نبيك محمد ﷺ في أعلى جنة الخلد.' },
+  { title: 'دعاء الرحمة',
+    text: 'اللهم ارحمني فإنك بي رحيم، واغفر لي فإنك أنت الغفور الرحيم، واهدني فإنك أنت الهادي إلى صراط مستقيم.' },
+  { title: 'دعاء العفو والمغفرة',
+    text: 'اللهم إنك عفو كريم تحب العفو فاعفُ عني. اللهم اغفر لي ذنبي كله، دقّه وجلّه، أوله وآخره، علانيته وسره.' },
+  { title: 'دعاء النصر',
+    text: 'اللهم أنت عضدي ونصيري، بك أحول وبك أصول وبك أقاتل. حسبنا الله ونعم الوكيل.' },
+];
+
+function dayOfYear() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  return Math.floor(diff / (1000*60*60*24));
+}
+
+function getTodaysDua() {
+  return DAILY_DUAS[dayOfYear() % DAILY_DUAS.length];
+}
+
+// ════════════════════════════════════════════════════════════════════
+// Render the HOME screen
+// ════════════════════════════════════════════════════════════════════
+function renderHome() {
+  const now = new Date();
+  const dayName = ARABIC_DAYS[now.getDay()];
+  const hijri = getHijriDate();
+  const gregDay = toArDigits(now.getDate());
+  const gregMonth = ARABIC_MONTHS_GREG[now.getMonth()];
+  const gregYear = toArDigits(now.getFullYear());
+
+  document.getElementById('hijri-day').textContent = dayName;
+  document.getElementById('hijri-date').textContent =
+    `${toArDigits(hijri.day)} ${hijri.monthName} ${toArDigits(hijri.year)} هـ`;
+  document.getElementById('greg-date').textContent =
+    `${gregDay} ${gregMonth} ${gregYear} م`;
+
+  const dua = getTodaysDua();
+  document.getElementById('dua-title').textContent = dua.title;
+  document.getElementById('dua-text').textContent = dua.text;
+
+  document.getElementById('home-today').textContent = state.todayTotal.toLocaleString('ar-SA');
+  document.getElementById('home-permanent').textContent = state.permanentTotal.toLocaleString('ar-SA');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// Toggle session type (tasbeeh ↔ salah) — preserves both progress
+// ════════════════════════════════════════════════════════════════════
+function toggleSessionType() {
+  const btn = document.getElementById('session-toggle');
+  btn.classList.add('swapping');
+  setTimeout(() => btn.classList.remove('swapping'), 400);
+
+  state.sessionType = (state.sessionType === 'tasbeeh') ? 'salah' : 'tasbeeh';
+  ss('sessionType', state.sessionType);
+  updateUI();
+}
+
+
+// ======= SCREEN MANAGEMENT =======
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  // Sync ALL nav buttons across all screens
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const activeIdMap = {
+    'home':           ['nav-home','nav-home1','nav-home2','nav-home3'],
+    'main':           ['nav-tasbeeh','nav-main','nav-main2','nav-main3'],
+    'stats':          ['nav-stats0','nav-stats','nav-stats2','nav-stats3'],
+    'settings-screen':['nav-settings0','nav-settings','nav-settings2','nav-settings3']
+  };
+  (activeIdMap[id] || []).forEach(navId => {
+    const el = document.getElementById(navId);
+    if (el) el.classList.add('active');
+  });
+
+  if (id === 'home')            renderHome();
+  if (id === 'main')            updateUI();
+  if (id === 'stats')           renderStats();
+  if (id === 'settings-screen') renderSettings();
+}
+
+// ======= MAIN COUNTER LOGIC =======
+function getDhikr() {
+  if (state.sessionType === 'salah') return SALAH;
+  // Show the dhikr corresponding to the next tap based on tasbeehCounter.
+  // Counter 0 → سبحان الله, after 1 tap counter=1 → الحمد لله, etc.
+  const c = state.tasbeehCounter;
+  const idx = c === 0 ? 0 : ((c) % TASBEEH.length);
+  return TASBEEH[idx];
+}
+
+function updateUI() {
+  const dhikr = getDhikr();
+  document.getElementById('current-dhikr').textContent = dhikr.text;
+  document.getElementById('dhikr-type-label').textContent = dhikr.label || '';
+
+  // Toggle button label shows current mode and indicates tap to switch
+  const isTasbeeh = state.sessionType === 'tasbeeh';
+  const labelEl = document.getElementById('session-label');
+  if (labelEl) {
+    labelEl.textContent = isTasbeeh
+      ? 'جلسة التسابيح'
+      : 'الصلاة على النبي ﷺ';
+  }
+
+  const counter = getCounter();
+  document.getElementById('counter-display').textContent = counter;
+  document.getElementById('today-total').textContent = state.todayTotal.toLocaleString('ar-SA');
+  document.getElementById('grand-total').textContent = state.permanentTotal.toLocaleString('ar-SA');
+  document.getElementById('session-num').textContent = state.sessionNum;
+
+  // Progress arc: circumference = 2πr = 2*π*85 ≈ 534
+  const circumference = 534;
+  const progress = Math.min(counter / state.target, 1);
+  const offset = circumference - (progress * circumference);
+  document.getElementById('progress-circle').style.strokeDashoffset = offset;
+}
+
+function vibrate() {
+  if (state.vibOn && navigator.vibrate) {
+    navigator.vibrate(40);
+  }
+}
+
+function handleTap() {
+  vibrate();
+  state.todayTotal++;
+  state.grandTotal++;
+  state.permanentTotal++; // NEVER decremented, NEVER reset
+
+  if (state.sessionType === 'tasbeeh') {
+    state.tasbeehCounter++;
+    state.tasbeehIndex = (state.tasbeehCounter - 1) % TASBEEH.length;
+    ss('tasbeehCounter', state.tasbeehCounter);
+    ss('tasbeehIndex', state.tasbeehIndex);
+  } else {
+    state.salahCounter++;
+    ss('salahCounter', state.salahCounter);
+  }
+
+  ss('todayTotal', state.todayTotal);
+  ss('grandTotal', state.grandTotal);
+  ss('permanentTotal', state.permanentTotal);
+
+  const today = state.lastDate;
+  state.daily[today] = state.todayTotal;
+  ss('daily', JSON.stringify(state.daily));
+
+  const btn = document.getElementById('tap-btn');
+  btn.classList.remove('tapped');
+  void btn.offsetWidth;
+  btn.classList.add('tapped');
+
+  updateUI();
+
+  if (getCounter() >= state.target) {
+    completeSession();
+  }
+}
+
+function completeSession() {
+  const title = document.getElementById('celeb-title');
+  const msg   = document.getElementById('celeb-msg');
+  const icon  = document.getElementById('celeb-icon');
+  const btnNext  = document.getElementById('celeb-btn-next');
+  const btnNew   = document.getElementById('celeb-btn-new');
+
+  if (state.sessionType === 'tasbeeh') {
+    icon.textContent  = '✨';
+    title.textContent = 'أحسنت!';
+    msg.textContent   = 'أتممت جلسة التسبيح\nهل تريد الانتقال للصلاة على النبي ﷺ؟';
+    btnNext.style.display = 'block';
+    btnNew.style.display  = 'none';
+  } else {
+    icon.textContent  = '🌙';
+    title.textContent = 'بارك الله فيك!';
+    msg.textContent   = 'أتممت الصلاة على النبي ﷺ\nجزاك الله خيراً وضاعف أجرك';
+    btnNext.style.display = 'none';
+    btnNew.style.display  = 'block';
+  }
+
+  shootConfetti();
+  document.getElementById('celebration').classList.add('show');
+}
+
+// After tasbeeh complete → reset tasbeeh counter and switch to salah
+function startNextType() {
+  document.getElementById('celebration').classList.remove('show');
+  state.tasbeehCounter = 0;
+  state.tasbeehIndex   = 0;
+  state.sessionType    = 'salah';
+  ss('sessionType', 'salah');
+  ss('tasbeehIndex', '0');
+  ss('tasbeehCounter', '0');
+  updateUI();
+}
+
+// After salah complete → reset both, go back to tasbeeh, increment session #
+function startNewSession() {
+  document.getElementById('celebration').classList.remove('show');
+  state.salahCounter   = 0;
+  state.tasbeehCounter = 0;
+  state.tasbeehIndex   = 0;
+  state.sessionType    = 'tasbeeh';
+  state.sessionNum++;
+  ss('sessionType', 'tasbeeh');
+  ss('tasbeehIndex', '0');
+  ss('tasbeehCounter', '0');
+  ss('salahCounter', '0');
+  ss('sessionNum', state.sessionNum);
+  updateUI();
+}
+
+function closeCelebration() {
+  document.getElementById('celebration').classList.remove('show');
+}
+
+function resetSession() {
+  const typeLabel = state.sessionType === 'salah' ? 'الصلاة على النبي' : 'التسبيح';
+  if (!confirm(`هل تريد إعادة تعيين عداد ${typeLabel}؟`)) return;
+  if (state.sessionType === 'tasbeeh') {
+    state.tasbeehCounter = 0;
+    state.tasbeehIndex   = 0;
+    ss('tasbeehCounter','0');
+    ss('tasbeehIndex','0');
+  } else {
+    state.salahCounter = 0;
+    ss('salahCounter','0');
+  }
+  updateUI();
+}
+
+// ======= CONFETTI =======
+function shootConfetti() {
+  const colors = ['#d4a017','#f0cc55','#3d9e3d','#8fd98f','#fff'];
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'confetti-particle';
+      p.style.left = Math.random()*100 + 'vw';
+      p.style.top = '-10px';
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      p.style.animationDuration = (1.5 + Math.random()) + 's';
+      p.style.transform = `rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 2500);
+    }, i * 50);
+  }
+}
+
+// ======= STATS =======
+function renderStats() {
+  document.getElementById('sh-total').textContent = state.permanentTotal.toLocaleString('ar-SA');
+  document.getElementById('sc-today').textContent = state.todayTotal.toLocaleString('ar-SA');
+
+  // Yesterday
+  const yd = new Date();
+  yd.setDate(yd.getDate()-1);
+  const ydStr = yd.toLocaleDateString('ar-SA');
+  document.getElementById('sc-yesterday').textContent = (state.daily[ydStr]||0).toLocaleString('ar-SA');
+
+  // This week
+  let weekTotal = 0;
+  for(let i=0;i<7;i++){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    const ds = d.toLocaleDateString('ar-SA');
+    weekTotal += (state.daily[ds]||0);
+  }
+  weekTotal += state.todayTotal;
+  document.getElementById('sc-week').textContent = weekTotal.toLocaleString('ar-SA');
+  document.getElementById('sc-sessions').textContent = state.sessionNum;
+
+  // Daily history
+  const today = state.lastDate;
+  const allDays = {...state.daily, [today]: state.todayTotal};
+  const sortedDays = Object.entries(allDays)
+    .filter(([,v]) => v > 0)
+    .sort((a,b) => b[0].localeCompare(a[0]))
+    .slice(0,14);
+
+  const maxVal = Math.max(...sortedDays.map(([,v])=>v), 1);
+  const container = document.getElementById('daily-history');
+  container.innerHTML = '';
+
+  if (sortedDays.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:var(--green-300);padding:20px;font-size:14px">لا توجد إحصائيات بعد</div>';
+    return;
+  }
+
+  sortedDays.forEach(([date, count]) => {
+    const pct = (count/maxVal*100).toFixed(0);
+    const row = document.createElement('div');
+    row.className = 'day-row';
+    row.innerHTML = `
+      <div class="dr-date">${date}</div>
+      <div class="day-bar-wrap"><div class="day-bar" style="width:${pct}%"></div></div>
+      <div class="dr-count">${count.toLocaleString('ar-SA')}</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function confirmReset() {
+  if (confirm('هل تريد مسح إحصائيات اليوم والسجل اليومي؟\n\n⚠️ العداد التراكمي الأبدي لن يُمسح أبداً.')) {
+    const saved = state.permanentTotal;
+    state.grandTotal     = 0;
+    state.todayTotal     = 0;
+    state.daily          = {};
+    state.tasbeehCounter = 0;
+    state.salahCounter   = 0;
+    state.tasbeehIndex   = 0;
+    state.sessionNum     = 1;
+    state.sessionType    = 'tasbeeh';
+    state.permanentTotal = saved;
+    ['grandTotal','todayTotal','tasbeehCounter','salahCounter','sessionNum','tasbeehIndex']
+      .forEach(k => ss(k, '0'));
+    ss('daily', '{}');
+    ss('sessionType', 'tasbeeh');
+    ss('permanentTotal', saved);
+    updateUI();
+    renderStats();
+    if (document.getElementById('home').classList.contains('active')) renderHome();
+    alert('تم مسح الإحصائيات. العداد التراكمي الأبدي محفوظ.');
+  }
+}
+
+// ======= SETTINGS =======
+function renderSettings() {
+  document.getElementById('count-val').textContent = state.dailyCount;
+  document.getElementById('target-val').textContent = state.target;
+  document.getElementById('notif-toggle').className = 'toggle' + (state.notifOn?' on':'');
+  document.getElementById('vib-toggle').className = 'toggle' + (state.vibOn?' on':'');
+  document.getElementById('times-section').style.display = state.notifOn ? '' : 'none';
+  renderTimes();
+}
+
+function renderTimes() {
+  const list = document.getElementById('times-list');
+  list.innerHTML = '';
+  state.notifTimes.forEach((t, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'time-pill';
+    pill.innerHTML = `
+      <input type="time" value="${t}" onchange="updateTime(${i}, this.value)">
+      <button class="time-remove" onclick="removeTime(${i})">×</button>
+    `;
+    list.appendChild(pill);
+  });
+}
+
+function addTime() {
+  state.notifTimes.push('09:00');
+  renderTimes();
+}
+function removeTime(i) {
+  state.notifTimes.splice(i,1);
+  renderTimes();
+}
+function updateTime(i,v) { state.notifTimes[i]=v; }
+
+function changeCount(d) {
+  state.dailyCount = Math.max(1, Math.min(10, state.dailyCount+d));
+  document.getElementById('count-val').textContent = state.dailyCount;
+}
+function changeTarget(d) {
+  state.target = Math.max(10, Math.min(1000, state.target+d));
+  document.getElementById('target-val').textContent = state.target;
+}
+function toggleNotif() {
+  state.notifOn = !state.notifOn;
+  document.getElementById('notif-toggle').className = 'toggle'+(state.notifOn?' on':'');
+  document.getElementById('times-section').style.display = state.notifOn ? '' : 'none';
+}
+function toggleVib() {
+  state.vibOn = !state.vibOn;
+  document.getElementById('vib-toggle').className = 'toggle'+(state.vibOn?' on':'');
+}
+
+function saveSettings() {
+  ss('dailyCount', state.dailyCount);
+  ss('target', state.target);
+  ss('notifOn', state.notifOn);
+  ss('vibOn', state.vibOn);
+  ss('notifTimes', JSON.stringify(state.notifTimes));
+  vibrate();
+  sendTimesToSW();
+  if (state.notifOn) scheduleNotifications();
+  const btn = document.querySelector('.save-btn');
+  btn.textContent = '✅ تم الحفظ!';
+  setTimeout(()=>btn.textContent='💾 حفظ الإعدادات', 2000);
+}
+
+// ======= SERVICE WORKER + NOTIFICATIONS =======
+let swReg = null;
+
+async function initSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    console.log('SW registered');
+    // Listen for messages from SW
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.type === 'GET_TIMES') sendTimesToSW();
+    });
+    // Send times once SW is ready
+    await navigator.serviceWorker.ready;
+    sendTimesToSW();
+    // Register periodic sync if supported (Chrome Android)
+    if (swReg && 'periodicSync' in swReg) {
+      try {
+        await swReg.periodicSync.register('tasbeeh-check', { minInterval: 60 * 60 * 1000 });
+      } catch(e) { /* not supported, that's ok */ }
+    }
+  } catch(err) {
+    console.warn('SW registration failed:', err);
+  }
+}
+
+function sendTimesToSW() {
+  if (!navigator.serviceWorker.controller) return;
+  navigator.serviceWorker.controller.postMessage({
+    type: 'UPDATE_TIMES',
+    times: state.notifTimes,
+    enabled: state.notifOn
+  });
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  const p = await Notification.requestPermission();
+  return p === 'granted';
+}
+
+async function scheduleNotifications() {
+  if (!state.notifOn) return;
+  const granted = await requestNotifPermission();
+  if (!granted) {
+    alert('⚠️ يرجى السماح بالإشعارات من إعدادات المتصفح لكي تصلك التذكيرات');
+    return;
+  }
+  sendTimesToSW();
+}
+
+// Test notification (called from settings save)
+async function testNotification() {
+  const granted = await requestNotifPermission();
+  if (!granted) return;
+  if (swReg) {
+    swReg.showNotification('مسبحتي 📿', {
+      body: 'الإشعارات تعمل بنجاح ✅ ستصلك التذكيرات في الأوقات المحددة',
+      icon: './icons/icon-192.png',
+      vibrate: [200, 100, 200],
+      tag: 'tasbeeh-test'
+    });
+  }
+}
+
+// ======= PWA INSTALL PROMPT =======
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+  deferredInstallPrompt = null;
+});
+function installApp() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => {
+    deferredInstallPrompt = null;
+    document.getElementById('install-banner').style.display = 'none';
+  });
+}
+function dismissInstall() {
+  document.getElementById('install-banner').style.display = 'none';
+}
+
+// ======= INIT =======
+setTimeout(async () => {
+  document.getElementById('splash').classList.remove('active');
+  showScreen('home');
+  updateUI();
+  await initSW();
+  if (state.notifOn) scheduleNotifications();
+}, 2200);
+</script>
+<!-- PWA INSTALL BANNER -->
+<div id="install-banner" style="display:none;position:fixed;bottom:90px;left:16px;right:16px;
+  background:linear-gradient(135deg,#1a4a1a,#0f2d0f);border:1px solid rgba(212,160,23,0.5);
+  border-radius:16px;padding:14px 16px;z-index:50;align-items:center;gap:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);">
+  <span style="font-size:24px">📲</span>
+  <div style="flex:1">
+    <div style="font-size:14px;font-weight:600;color:#f0cc55">ثبّت التطبيق</div>
+    <div style="font-size:11px;color:#8fd98f">أضفه للشاشة الرئيسية للإشعارات الكاملة</div>
+  </div>
+  <button onclick="installApp()" style="background:linear-gradient(135deg,#d4a017,#f0cc55);
+    color:#0a1f0a;border:none;border-radius:10px;padding:8px 14px;font-family:Cairo,sans-serif;
+    font-size:13px;font-weight:700;cursor:pointer">تثبيت</button>
+  <button onclick="dismissInstall()" style="background:transparent;border:none;color:#8fd98f;
+    font-size:20px;cursor:pointer;padding:4px">×</button>
+</div>
+
+</body>
+</html>
